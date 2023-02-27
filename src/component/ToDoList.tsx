@@ -1,15 +1,21 @@
-import React from "react";
-import { useRecoilValue } from "recoil";
-import { toDoSelector, toDoState } from "../atoms";
+import React, { useEffect } from "react";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import {
+  Categories,
+  cateState,
+  toDoState,
+  toDoSelector,
+  IToDo,
+} from "../atoms";
 import CreateToDo from "./CreateToDo";
-import ToDo from "./ToDo";
 import styled from "styled-components";
+import ToDo from "./ToDo";
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: auto;
+  width: 100%;
   height: 100vh;
 `;
 
@@ -39,22 +45,68 @@ const Ul = styled.ul`
   border-radius: 10px;
 `;
 
+const Div = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+`;
+
+const Select = styled.select`
+  border-radius: 10px;
+  margin-right: 5px;
+  height: 30px;
+`;
+
+const SaveBtn = styled.button`
+  width: 250;
+  height: 60px;
+  border-radius: 5px;
+  background-color: ${(props) => props.theme.accentColor};
+  font-size: 25px;
+  margin-top: 10px;
+`;
+
 function ToDoList() {
-  const [To_Do, DOING, DONE] = useRecoilValue(toDoSelector);
-  const onSelected = (event: React.FocusEvent<HTMLSelectElement>) => {
-    console.log(event.currentTarget.value);
+  const toDos = useRecoilValue(toDoSelector);
+  const setCategory = useSetRecoilState(cateState);
+  const [allToDos, setAllToDos] = useRecoilState<IToDo[]>(toDoState);
+
+  useEffect(() => {
+    // const localData = localStorage.getItem("toDos");
+    // if (localData) {
+    //   setAllToDos(JSON.parse(localData));
+    // }
+  }, []);
+
+  const onSelected = (event: React.FormEvent<HTMLSelectElement>) => {
+    setCategory(event.currentTarget.value as any);
+  };
+
+  const onSave = () => {
+    // localStorage.setItem("toDos", JSON.stringify(allToDos));
+    // const save = localStorage.getItem("toDos") ? true : false;
+    // if (save) alert("저장되었습니다");
+    // else alert("저장 실패");
   };
 
   return (
     <Container>
       <H1>To Dos</H1>
       <Hr />
-      <select onInput={onSelected}>
-        <option value="To_Do">TO_DO</option>
-        <option value="DOING">DOING</option>
-        <option value="DONE">DONE</option>
-      </select>
-      <CreateToDo />
+      <Div>
+        <Select onInput={onSelected}>
+          <option value={Categories.TO_DO}>TO_DO</option>
+          <option value={Categories.DOING}>DOING</option>
+          <option value={Categories.DONE}>DONE</option>
+        </Select>
+        <CreateToDo />
+      </Div>
+      <Ul>
+        {toDos?.map((todo) => (
+          <ToDo key={todo.id} {...todo} />
+        ))}
+      </Ul>
+      <SaveBtn onClick={onSave}>Save</SaveBtn>
     </Container>
   );
 }

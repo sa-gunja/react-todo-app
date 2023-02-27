@@ -1,29 +1,36 @@
 import { atom, selector } from "recoil";
+import { recoilPersist } from "recoil-persist";
 
+const { persistAtom } = recoilPersist();
+
+export enum Categories {
+  "TO_DO" = "TO_DO",
+  "DOING" = "DOING",
+  "DONE" = "DONE",
+  "DELETE" = "DELETE",
+}
 export interface IToDo {
   text: string;
   id: number;
-  category: "TO_DO" | "DOING" | "DONE";
+  category: Categories;
 }
 
 export const toDoState = atom<IToDo[]>({
   key: "toDo",
   default: [],
+  effects_UNSTABLE: [persistAtom],
 });
 
-export const category = atom({
+export const cateState = atom({
   key: "category",
-  default: "",
+  default: Categories.TO_DO,
 });
 
 export const toDoSelector = selector({
   key: "toDoSelector",
   get: ({ get }) => {
     const toDos = get(toDoState);
-    return [
-      toDos.filter((todo) => todo.category === "TO_DO"),
-      toDos.filter((todo) => todo.category === "DOING"),
-      toDos.filter((todo) => todo.category === "DONE"),
-    ];
+    const category = get(cateState);
+    return toDos.filter((todo) => todo.category === category);
   },
 });
