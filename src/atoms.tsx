@@ -4,15 +4,16 @@ import { recoilPersist } from "recoil-persist";
 const { persistAtom } = recoilPersist();
 
 export enum Categories {
-  "TO_DO" = "TO_DO",
-  "DOING" = "DOING",
-  "DONE" = "DONE",
   "DELETE" = "DELETE",
 }
 export interface IToDo {
   text: string;
   id: number;
-  category: Categories;
+  category: string;
+}
+
+export interface ICateList {
+  [key: string]: [];
 }
 
 export const toDoState = atom<IToDo[]>({
@@ -23,7 +24,13 @@ export const toDoState = atom<IToDo[]>({
 
 export const cateState = atom({
   key: "category",
-  default: Categories.TO_DO,
+  default: {},
+});
+
+export const cateListState = atom<ICateList[]>({
+  key: "cateList",
+  default: [],
+  effects_UNSTABLE: [persistAtom],
 });
 
 export const toDoSelector = selector({

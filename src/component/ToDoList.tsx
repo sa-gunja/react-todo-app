@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import {
   Categories,
@@ -6,10 +6,12 @@ import {
   toDoState,
   toDoSelector,
   IToDo,
+  cateListState,
 } from "../atoms";
 import CreateToDo from "./CreateToDo";
 import styled from "styled-components";
 import ToDo from "./ToDo";
+import CreateCate from "./CreateCate";
 
 const Container = styled.div`
   display: flex;
@@ -57,47 +59,35 @@ const Select = styled.select`
   height: 30px;
 `;
 
-const SaveBtn = styled.button`
-  width: 250;
-  height: 60px;
-  border-radius: 5px;
-  background-color: ${(props) => props.theme.accentColor};
-  font-size: 25px;
-  margin-top: 10px;
-`;
-
 function ToDoList() {
+  const cateList = useRecoilValue(cateListState);
   const toDos = useRecoilValue(toDoSelector);
   const setCategory = useSetRecoilState(cateState);
   const [allToDos, setAllToDos] = useRecoilState<IToDo[]>(toDoState);
 
-  useEffect(() => {
-    // const localData = localStorage.getItem("toDos");
-    // if (localData) {
-    //   setAllToDos(JSON.parse(localData));
-    // }
-  }, []);
-
   const onSelected = (event: React.FormEvent<HTMLSelectElement>) => {
-    setCategory(event.currentTarget.value as any);
-  };
-
-  const onSave = () => {
-    // localStorage.setItem("toDos", JSON.stringify(allToDos));
-    // const save = localStorage.getItem("toDos") ? true : false;
-    // if (save) alert("저장되었습니다");
-    // else alert("저장 실패");
+    // setCategory(event.currentTarget.value as any);
+    console.log(event.currentTarget.value);
+    let selectName = event.currentTarget.value;
+    setCategory(selectName);
   };
 
   return (
     <Container>
       <H1>To Dos</H1>
       <Hr />
+      <CreateCate />
       <Div>
         <Select onInput={onSelected}>
-          <option value={Categories.TO_DO}>TO_DO</option>
+          <option>none</option>
+          {Object.keys(cateList).map((key, index) => (
+            <option key={index} value={key}>
+              {key}
+            </option>
+          ))}
+          {/* <option value={Categories.TO_DO}>TO_DO</option>
           <option value={Categories.DOING}>DOING</option>
-          <option value={Categories.DONE}>DONE</option>
+          <option value={Categories.DONE}>DONE</option> */}
         </Select>
         <CreateToDo />
       </Div>
@@ -106,7 +96,6 @@ function ToDoList() {
           <ToDo key={todo.id} {...todo} />
         ))}
       </Ul>
-      <SaveBtn onClick={onSave}>Save</SaveBtn>
     </Container>
   );
 }

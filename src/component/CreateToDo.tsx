@@ -28,15 +28,25 @@ function CreateToDo() {
   const setToDos = useSetRecoilState(toDoState);
   const { register, handleSubmit, setValue } = useForm<IForm>();
   const category = useRecoilValue(cateState);
-  const handleValid = ({ toDo }: IForm ) => {
-    setToDos((oldToDos) => [{ text: toDo, id: Date.now(), category: category as any }, ...oldToDos]);
+  const handleValid = ({ toDo }: IForm) => {
+    if (typeof category === "object" || category === "none") {
+      alert("카테고리를 선택해주세요.");
+      return false;
+    }
+
+    setToDos((oldToDos) => [
+      { text: toDo, id: Date.now(), category: category as any },
+      ...oldToDos,
+    ]);
     setValue("toDo", "");
-    
   };
 
   return (
     <form onSubmit={handleSubmit(handleValid)}>
-      <Input {...register("toDo", { required: "Please write a To Do" })} placeholder="write to do" />
+      <Input
+        {...register("toDo", { required: "Please write a To Do" })}
+        placeholder="write to do"
+      />
       <Btn>Add</Btn>
     </form>
   );
